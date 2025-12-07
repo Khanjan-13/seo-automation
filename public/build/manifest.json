@@ -1,0 +1,50 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-BMGCmgPS.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/css/normal/dashboard.css": {
+    "file": "assets/dashboard-Dyu0JUYZ.css",
+    "src": "resources/css/normal/dashboard.css",
+    "isEntry": true,
+    "name": "dashboard",
+    "names": [
+      "dashboard.css"
+    ]
+  },
+  "resources/css/normal/document.css": {
+    "file": "assets/document-DXWuo_hD.css",
+    "src": "resources/css/normal/document.css",
+    "isEntry": true,
+    "name": "document",
+    "names": [
+      "document.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-DGJf6Hlq.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "css": [
+      "assets/app-BMGCmgPS.css"
+    ]
+  },
+  "resources/js/normal/dashboard.js": {
+    "file": "assets/dashboard-Dka_D3rF.js",
+    "name": "dashboard",
+    "src": "resources/js/normal/dashboard.js",
+    "isEntry": true
+  },
+  "resources/js/normal/document.js": {
+    "file": "assets/document-BA4SDxRk.js",
+    "name": "document",
+    "src": "resources/js/normal/document.js",
+    "isEntry": true
+  }
+}

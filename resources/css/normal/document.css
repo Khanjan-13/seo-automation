@@ -1,0 +1,132 @@
+/* Custom Quill Overrides for "Clean" look */
+.ql-toolbar.ql-snow {
+    border: none !important;
+    padding: 12px 0 !important;
+}
+.ql-container.ql-snow {
+    border: none !important;
+    font-family: "Inter", sans-serif; /* Or a serif font if preferred */
+    font-size: 1.125rem; /* 18px */
+}
+.ql-editor {
+    padding: 0 !important;
+    line-height: 1.8;
+    color: #111827; /* gray-900 for light mode */
+}
+.ql-editor h1 {
+    font-size: 2.5em;
+    font-weight: 800;
+    margin-bottom: 0.5em;
+    letter-spacing: -0.025em;
+}
+.ql-editor h2 {
+    font-size: 1.75em;
+    font-weight: 700;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    letter-spacing: -0.025em;
+}
+.ql-editor p {
+    margin-bottom: 1.5em;
+    color: inherit;
+}
+
+/* Dark mode overrides for Quill */
+.dark .ql-editor {
+    color: #e5e7eb;
+}
+.dark .ql-editor p {
+    color: inherit;
+}
+.dark .ql-editor h1,
+.dark .ql-editor h2,
+.dark .ql-editor h3 {
+    color: #ffffff;
+}
+.dark .ql-toolbar .ql-stroke {
+    stroke: #9ca3af;
+}
+.dark .ql-toolbar .ql-fill {
+    fill: #9ca3af;
+}
+.dark .ql-toolbar .ql-picker {
+    color: #9ca3af;
+}
+
+/* Hide scrollbar for horizontal lists */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Regenerate Overlay Button Styles */
+.regenerate-overlay-btn {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #4f46e5; /* indigo-600 */
+    background-color: #ffffff;
+    border: 1px solid #e0e7ff; /* indigo-100 */
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    pointer-events: auto; /* Enable clicks */
+    transition: all 0.2s;
+    user-select: none;
+    opacity: 0.8;
+}
+.regenerate-overlay-btn:hover {
+    background-color: #f3f4f6;
+    opacity: 1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+.dark .regenerate-overlay-btn {
+    color: #818cf8;
+    background-color: #312e81;
+    border-color: #4338ca;
+    opacity: 0.9;
+}
+.dark .regenerate-overlay-btn:hover {
+    background-color: #3730a3;
+    opacity: 1;
+}
+
+/* Skeleton Loader */
+.skeleton-loader {
+    display: block; /* Ensure it takes space */
+    /* padding-: 8px 0; Reduced from 16px */
+    width: 100%;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    pointer-events: none; /* Let clicks pass through if needed */
+}
+.skeleton-line {
+    height: 12px;
+    background-color: #e5e7eb; /* gray-200 */
+    border-radius: 4px;
+    margin-bottom: 0px; /* Reduced from 12px */
+    width: 100%;
+}
+.skeleton-line:last-child {
+    width: 80%;
+}
+.dark .skeleton-line {
+    background-color: #374151; /* gray-700 */
+}
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
