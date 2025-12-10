@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Chat;
 use App\Models\Message;
+use App\Models\DocumentShare;
 use App\Services\AIService;
+use Illuminate\Support\Str;
 
 class DocumentController extends Controller
 {
@@ -40,7 +42,7 @@ class DocumentController extends Controller
         $generatedContent = $aiMessage ? $aiMessage->content : 'No content found.';
         $model = request('model', 'AI Model'); // Fallback if model not passed
 
-        return view('normal.document', compact('generatedContent', 'model'));
+        return view('normal.document', compact('generatedContent', 'model', 'chat'));
     }
 
     public function update(Request $request, $chatId)
@@ -49,21 +51,33 @@ class DocumentController extends Controller
         $chat = Chat::where('user_id', $user->id)->findOrFail($chatId);
 
         $request->validate([
-            'content' => 'required',
+            'content' => 'nullable',
+            'title' => 'nullable|string|max:255',
         ]);
 
-        // Update the latest AI message
-        $aiMessage = Message::where('chat_id', $chat->id)
-                            ->where('sender', 'ai')
-                            ->latest()
-                            ->first();
-
-        if ($aiMessage) {
-            $aiMessage->update(['content' => $request->content]);
-            return response()->json(['success' => true, 'message' => 'Document saved successfully.']);
+        // Update title if provided
+        if ($request->has('title')) {
+            $chat->update(['title' => $request->title]);
+            return response()->json(['success' => true, 'message' => 'Title updated successfully.']);
         }
 
-        return response()->json(['success' => false, 'message' => 'Document not found.'], 404);
+        // Update content if provided
+        if ($request->has('content')) {
+            // Update the latest AI message
+            $aiMessage = Message::where('chat_id', $chat->id)
+                                ->where('sender', 'ai')
+                                ->latest()
+                                ->first();
+
+            if ($aiMessage) {
+                $aiMessage->update(['content' => $request->content]);
+                return response()->json(['success' => true, 'message' => 'Document saved successfully.']);
+            }
+
+            return response()->json(['success' => false, 'message' => 'Document not found.'], 404);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No data to update.'], 400);
     }
 
     public function regenerateSection(Request $request)
@@ -95,7 +109,15 @@ class DocumentController extends Controller
         $prompt .= "2. Maintain the formatting (HTML tags) if present.\n";
         $prompt .= "3. Do not add any conversational filler.\n";
 
-        $newContent = $this->aiService->generateContent($model, $prompt);
+        $result = $this->aiService->generateContent($model, $prompt);
+        
+        // Handle result being either string (error) or array (success)
+        if (is_array($result)) {
+            $newContent = $result['content'];
+            // Note: We are currently not tracking cost for regeneration as this endpoint is stateless/doesn't receive chat_id
+        } else {
+            $newContent = $result;
+        }
 
         return response()->json(['success' => true, 'content' => $newContent]);
     }
@@ -111,5 +133,34 @@ class DocumentController extends Controller
         $chat->delete();
 
         return redirect()->route('normal.documents')->with('success', 'Document deleted successfully.');
+    }
+
+    public function generateShare(Request $request, $chatId)
+    {
+        $user = Auth::guard('normaluser')->user();
+        $chat = Chat::where('user_id', $user->id)->findOrFail($chatId);
+
+        // Check if share link already exists
+        $share = DocumentShare::where('chat_id', $chat->id)
+                              ->where('is_active', true)
+                              ->first();
+
+        if (!$share) {
+            // Generate new share token
+            $share = DocumentShare::create([
+                'chat_id' => $chat->id,
+                'share_token' => Str::random(32),
+                'is_active' => true,
+            ]);
+        }
+
+        $shareUrl = route('share.view', ['token' => $share->share_token]);
+        $googleDocsUrl = 'https://docs.google.com/document/create?url=' . urlencode($shareUrl);
+
+        return response()->json([
+            'success' => true,
+            'share_url' => $shareUrl,
+            'google_docs_url' => $googleDocsUrl,
+        ]);
     }
 }

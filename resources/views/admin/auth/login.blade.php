@@ -31,11 +31,17 @@
 
     <div class="w-full max-w-[400px] px-5">
         <!-- Logo -->
-        <div class="flex justify-center mb-10">
-            <div class="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+            <div class="flex justify-center mb-10">
+            <img
+                src="{{ asset('images/light_logo.png') }}"
+                class="h-12 w-auto dark:hidden"
+                alt="Logo">
+            <img
+                src="{{ asset('images/dark_logo.png') }}"
+                class="h-12 w-auto hidden dark:block"
+                alt="Logo">
             </div>
-        </div>
+        
 
         <!-- Header -->
         <div class="text-center mb-8">
@@ -54,13 +60,13 @@
 
             <div>
                 <input type="email" name="email" placeholder="Email address" value="{{ old('email') }}"
-                       class="w-full bg-[#2A2B32] border border-[#565869] text-black dark:text-white rounded px-4 py-4 focus:outline-none focus:border-[#10a37f] placeholder-gray-400 transition-colors"
+                       class="w-full bg-white border border-[#565869] text-black dark:text-white rounded px-4 py-4 focus:outline-none focus:border-[#10a37f] placeholder-gray-400 transition-colors"
                        required>
             </div>
 
             <div>
                 <input type="password" name="password" placeholder="Password"
-                       class="w-full bg-[#2A2B32] border border-[#565869] text-black dark:text-white rounded px-4 py-4 focus:outline-none focus:border-[#10a37f] placeholder-gray-400 transition-colors"
+                       class="w-full bg-white border border-[#565869] text-black dark:text-white rounded px-4 py-4 focus:outline-none focus:border-[#10a37f] placeholder-gray-400 transition-colors"
                        required>
             </div>
 

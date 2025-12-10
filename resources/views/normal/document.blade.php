@@ -12,12 +12,14 @@
             <a href="{{ route('normal.documents') }}" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                 <span class="material-icons">arrow_back</span>
             </a>
-            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                <span class="font-medium text-gray-900 dark:text-white">Content Editor</span>
-                <span class="text-gray-400">/</span>
-                <span class="flex items-center gap-1">
-                    <span class="truncate max-w-[200px]">{{ $model }} Generated Content</span>
-                </span>
+            <div class="flex items-center gap-2">
+                <input 
+                    type="text" 
+                    id="document-title" 
+                    value="{{ $chat->title ?? 'Untitled Document' }}"
+                    class="text-lg font-semibold text-gray-900 dark:text-white bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded px-2 py-1 min-w-[200px] max-w-[400px]"
+                    placeholder="Document Title"
+                />
             </div>
         </div>
         <div class="flex items-center gap-3">
@@ -30,7 +32,7 @@
             <button class="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors flex items-center gap-2">
                 <span class="material-icons text-[18px]">file_download</span> Export
             </button>
-            <button class="px-4 py-2 bg-black dark:bg-gray-800 text-white text-sm font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors flex items-center gap-2">
+            <button id="share-btn" class="px-4 py-2 bg-black dark:bg-gray-800 text-white text-sm font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors flex items-center gap-2">
                 <span class="material-icons text-[18px]">share</span> Share
             </button>
         </div>
@@ -84,35 +86,34 @@
         <div class="w-80 bg-white dark:bg-[#303030] border-l border-gray-200 dark:border-gray-700 flex flex-col overflow-y-auto">
             <!-- Tabs -->
             <div class="flex border-b border-gray-200 dark:border-gray-700">
-                <button class="flex-1 py-3 text-xs font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 uppercase tracking-wide">Guidelines</button>
-                <button class="flex-1 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 uppercase tracking-wide">Facts</button>
-                <button class="flex-1 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 uppercase tracking-wide">Outline</button>
+                <button id="tab-guidelines" class="tab-btn flex-1 py-3 text-xs font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 uppercase tracking-wide" data-tab="guidelines">Guidelines</button>
+                <button id="tab-facts" class="tab-btn flex-1 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 uppercase tracking-wide" data-tab="facts">Facts</button>
+                <button id="tab-outline" class="tab-btn flex-1 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 uppercase tracking-wide" data-tab="outline">Outline</button>
             </div>
 
-            <div class="p-6 space-y-8">
+            <div id="tab-content-guidelines" class="tab-content p-6 space-y-8">
                 <!-- Content Score -->
                 <div>
                     <div class="flex items-center gap-2 mb-4">
                         <h3 class="text-sm font-bold text-gray-900 dark:text-white">Content Score</h3>
-                        <span class="material-icons text-gray-400 text-sm">info</span>
+                        <span class="material-icons text-gray-400 text-sm" title="Overall SEO quality score based on word count, headings, readability, and keyword usage">info</span>
                     </div>
                     
                     <div class="relative w-40 h-20 mx-auto mb-2">
                         <div class="absolute inset-0 flex items-end justify-center pb-1">
                             <div class="text-center">
-                                <span class="text-3xl font-bold text-gray-900 dark:text-white">88</span>
+                                <span id="seo-score" class="text-3xl font-bold text-gray-900 dark:text-white">0</span>
                                 <span class="text-gray-400 text-sm">/100</span>
                             </div>
                         </div>
-                        <!-- Simple SVG Gauge Mockup -->
+                        <!-- SVG Gauge -->
                         <svg viewBox="0 0 100 50" class="w-full h-full transform">
                             <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#eee" stroke-width="8" class="dark:stroke-gray-700" />
-                            <path d="M 10 50 A 40 40 0 0 1 75 20" fill="none" stroke="#22c55e" stroke-width="8" stroke-dasharray="100" stroke-dashoffset="0" />
+                            <path id="score-gauge" d="M 10 50 A 40 40 0 0 1 10 50" fill="none" stroke="#22c55e" stroke-width="8" stroke-linecap="round" />
                         </svg>
                     </div>
-                    <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 px-4">
-                        <span>Avg 74</span>
-                        <span>Top 77</span>
+                    <div class="text-center text-xs text-gray-500 dark:text-gray-400">
+                        <span id="score-label">Start writing to see your score</span>
                     </div>
                 </div>
 
@@ -144,40 +145,107 @@
                     </div>
                 </div>
 
-                <!-- Terms -->
+                <!-- Keyword Density -->
                 <div>
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-sm font-bold text-gray-900 dark:text-white">Terms</h3>
-                        <button class="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1">
-                            <span class="material-icons text-[14px]">tune</span> Adjust
-                        </button>
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white">Keyword Density</h3>
+                        <span class="material-icons text-gray-400 text-sm" title="Percentage of content occupied by each keyword">info</span>
                     </div>
 
                     <div class="relative mb-4">
                         <span class="absolute left-3 top-2.5 text-gray-400 material-icons text-sm">search</span>
-                        <input type="text" placeholder="Search terms..." class="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white placeholder-gray-400">
+                        <input id="keyword-search" type="text" placeholder="Search keywords..." class="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white placeholder-gray-400">
                     </div>
 
-                    <div class="flex gap-2 mb-4 overflow-x-auto pb-2 no-scrollbar">
-                        <button class="px-3 py-1 bg-indigo-600 text-white text-xs rounded-full whitespace-nowrap">All 76</button>
-                        <button class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full whitespace-nowrap hover:bg-gray-200 dark:hover:bg-gray-600">Headings 5</button>
-                        <button class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full whitespace-nowrap hover:bg-gray-200 dark:hover:bg-gray-600">NLP 75</button>
+                    <div class="space-y-2 max-h-64 overflow-y-auto" id="keywords-list">
+                        <div class="text-center text-sm text-gray-400 py-4">Start writing to see keyword analysis</div>
                     </div>
+                </div>
 
-                    <div class="space-y-2" id="keywords-list">
-                        <!-- Keywords will be populated by JS -->
-                        <div class="flex items-center justify-between group cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded">
-                            <span class="text-sm text-gray-700 dark:text-gray-300">content marketing</span>
-                            <span class="text-xs font-medium text-green-600 bg-green-50 dark:bg-green-900/30 px-2 py-0.5 rounded">2/4</span>
+                <!-- Readability Score -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white">Readability</h3>
+                        <span class="material-icons text-gray-400 text-sm" title="Flesch Reading Ease score - higher is easier to read">info</span>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <div class="text-center mb-2">
+                            <span id="readability-score" class="text-2xl font-bold text-gray-900 dark:text-white">0</span>
+                            <span class="text-gray-400 text-sm">/100</span>
                         </div>
-                        <div class="flex items-center justify-between group cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded">
-                            <span class="text-sm text-gray-700 dark:text-gray-300">strategy</span>
-                            <span class="text-xs font-medium text-yellow-600 bg-yellow-50 dark:bg-yellow-900/30 px-2 py-0.5 rounded">1/3</span>
-                        </div>
-                        <div class="flex items-center justify-between group cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded">
-                            <span class="text-sm text-gray-700 dark:text-gray-300">audience</span>
-                            <span class="text-xs font-medium text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-0.5 rounded">0/2</span>
-                        </div>
+                        <div id="readability-label" class="text-center text-xs text-gray-500 dark:text-gray-400">No content yet</div>
+                    </div>
+                </div>
+
+                <!-- SEO Issues -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white">SEO Issues</h3>
+                        <span id="issues-count" class="text-xs font-medium text-gray-500 dark:text-gray-400">0</span>
+                    </div>
+                    <div id="seo-issues-list" class="space-y-2">
+                        <div class="text-center text-sm text-gray-400 py-2">No issues detected</div>
+                    </div>
+                </div>
+
+                <!-- Top Words -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white">Top Repeated Words</h3>
+                        <span class="material-icons text-gray-400 text-sm" title="Most frequently used words (excluding common words)">info</span>
+                    </div>
+                    <div id="top-words-list" class="space-y-2">
+                        <div class="text-center text-sm text-gray-400 py-2">Start writing to see analysis</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Facts Tab Content -->
+            <div id="tab-content-facts" class="tab-content hidden p-6 space-y-6">
+                <!-- Key Statistics -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white">Key Statistics</h3>
+                        <span class="material-icons text-gray-400 text-sm" title="Numbers and statistics found in your content">info</span>
+                    </div>
+                    <div id="statistics-list" class="space-y-2">
+                        <div class="text-center text-sm text-gray-400 py-2">No statistics found</div>
+                    </div>
+                </div>
+
+                <!-- Important Dates -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white">Important Dates</h3>
+                        <span class="material-icons text-gray-400 text-sm" title="Dates mentioned in your content">info</span>
+                    </div>
+                    <div id="dates-list" class="space-y-2">
+                        <div class="text-center text-sm text-gray-400 py-2">No dates found</div>
+                    </div>
+                </div>
+
+                <!-- Key Facts -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white">Key Facts</h3>
+                        <span class="material-icons text-gray-400 text-sm" title="Important factual statements">info</span>
+                    </div>
+                    <div id="facts-list" class="space-y-2">
+                        <div class="text-center text-sm text-gray-400 py-2">Write content to extract key facts</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outline Tab Content -->
+            <div id="tab-content-outline" class="tab-content hidden p-6">
+                <div class="flex items-center gap-2 mb-4">
+                    <h3 class="text-sm font-bold text-gray-900 dark:text-white">Document Outline</h3>
+                    <span class="material-icons text-gray-400 text-sm" title="Navigate through your document structure">info</span>
+                </div>
+                <div id="outline-list" class="space-y-1">
+                    <div class="text-center text-sm text-gray-400 py-8">
+                        <span class="material-icons text-3xl mb-2">list_alt</span>
+                        <p>Add headings to create an outline</p>
                     </div>
                 </div>
             </div>
@@ -261,6 +329,77 @@
           Regenerate
         </button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Share Modal -->
+<div id="share-modal" class="fixed inset-0 z-[100] hidden">
+  
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-md"></div>
+
+  <!-- Modal Wrapper -->
+  <div class="relative flex min-h-screen items-center justify-center p-4">
+    
+    <!-- Modal Card -->
+    <div class="w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2b2b2b] shadow-2xl">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center gap-3">
+          <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/40">
+            <span class="material-icons text-indigo-600 dark:text-indigo-400 text-[20px]">share</span>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            Share Document
+          </h3>
+        </div>
+        <button id="close-share-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition">
+          ✕
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="px-6 py-5 space-y-4">
+        
+        <!-- Share Link -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Share Link
+          </label>
+          <div class="flex gap-2">
+            <input
+              id="share-link-input"
+              type="text"
+              readonly
+              value="Generating link..."
+              class="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#1f1f1f] px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            />
+            <button
+              id="copy-link-btn"
+              class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition flex items-center gap-2"
+            >
+              <span class="material-icons text-sm">content_copy</span>
+              Copy
+            </button>
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+          <div class="flex gap-2">
+            <span class="material-icons text-blue-600 dark:text-blue-400 text-sm mt-0.5">info</span>
+            <p class="text-xs text-blue-800 dark:text-blue-300">
+              This link will always show the latest version of your document. Anyone with the link can view it.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+    
     </div>
   </div>
 </div>

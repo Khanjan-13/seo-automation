@@ -19,6 +19,16 @@ return Application::configure(basePath: dirname(__DIR__))
             }
             return route('normal.login');
         });
+
+        $middleware->redirectUsersTo(function (Request $request) {
+            if ($request->user('admin')) {
+                return route('admin.dashboard');
+            }
+            if ($request->user('normaluser')) {
+                return route('normal.dashboard');
+            }
+            return '/';
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

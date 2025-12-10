@@ -12,6 +12,11 @@ class Chat extends Model
     protected $fillable = [
         'user_id',
         'prompt',
+        'title',
+        'model',
+        'input_tokens',
+        'output_tokens',
+        'cost',
     ];
 
     public function messages()

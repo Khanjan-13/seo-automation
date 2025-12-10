@@ -23,6 +23,10 @@
                         <tr class="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
                             <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Document</th>
                             <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date Created</th>
+                            <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Model</th>
+                            <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Input Tokens</th>
+                            <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Output Tokens</th>
+                            <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Cost</th>
                             <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">Actions</th>
                         </tr>
                     </thead>
@@ -36,7 +40,7 @@
                                         </div>
                                         <div class="min-w-0">
                                             <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate max-w-xs md:max-w-md" title="{{ $chat->prompt }}">
-                                                {{ Str::limit($chat->prompt, 60) }}
+                                                {{ Str::limit($chat->title, 60) }}
                                             </h3>
                                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                                                 Generated content
@@ -50,6 +54,26 @@
                                     </div>
                                     <div class="text-xs text-gray-500 dark:text-gray-400">
                                         {{ $chat->created_at->format('h:i A') }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900 dark:text-white font-medium">
+                                        {{ $chat->model }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900 dark:text-white font-medium">
+                                        {{ $chat->input_tokens }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900 dark:text-white font-medium">
+                                        {{ $chat->output_tokens }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900 dark:text-white font-medium">
+                                        ${{ $chat->cost }}
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right">

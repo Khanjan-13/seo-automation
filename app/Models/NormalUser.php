@@ -27,4 +27,9 @@ class NormalUser extends Authenticatable
     {
         return $this->hasMany(Chat::class, 'user_id');
     }
+
+    public function templates()
+    {
+        return $this->hasMany(Template::class, 'user_id');
+    }
 }

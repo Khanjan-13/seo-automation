@@ -1,14 +1,20 @@
 <div class="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-[#181818] border-r border-gray-200 dark:border-gray-800 flex flex-col z-50 transition-colors duration-200">
 
     <!-- Logo Section -->
-    <div class="p-6 border-b border-gray-100 dark:border-gray-800">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gray-900 dark:bg-white rounded-xl flex items-center justify-center">
-                <span class="text-lg text-white dark:text-gray-900">✨</span>
-            </div>
-            <h1 class="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">AiSeo</h1>
-        </div>
-    </div>
+   <div class="px-6 py-5 border-b border-zinc-200 dark:border-zinc-800 flex justify-center">
+    <img
+        src="{{ asset('images/light_logo.png') }}"
+        class="h-12 w-auto dark:hidden"
+        alt="AiSeo Logo"
+    >
+    <img
+        src="{{ asset('images/dark_logo.png') }}"
+        class="h-12 w-auto hidden dark:block"
+        alt="AiSeo Logo"
+    >
+</div>
+
+
 
     <!-- Navigation -->
     <nav class="flex-1 overflow-y-auto p-4 space-y-1">
@@ -26,6 +32,12 @@
            class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
             <span class="material-icons text-gray-700 dark:text-gray-400">auto_awesome_motion</span>
             <span class="font-medium">Documents</span>
+        </a>
+
+        <a href="{{ route('normal.templates') }}"
+           class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+            <span class="material-icons text-gray-700 dark:text-gray-400">folder_special</span>
+            <span class="font-medium">Templates</span>
         </a>
 
         <a href="{{ route('normal.settings') }}"

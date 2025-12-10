@@ -2,15 +2,16 @@
 
     <!-- Logo Section -->
     <div class="p-6 border-b border-gray-100 dark:border-gray-800">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gray-900 dark:bg-white rounded-xl flex items-center justify-center">
-                <span class="material-icons text-white dark:text-gray-900 text-xl">admin_panel_settings</span>
-            </div>
-            <div>
-                <h1 class="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">Admin</h1>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Dashboard</p>
-            </div>
-        </div>
+        <img
+        src="{{ asset('images/light_logo.png') }}"
+        class="h-12 w-auto dark:hidden"
+        alt="AiSeo Logo"
+    >
+    <img
+        src="{{ asset('images/dark_logo.png') }}"
+        class="h-12 w-auto hidden dark:block"
+        alt="AiSeo Logo"
+    >
     </div>
 
     <!-- Navigation -->
