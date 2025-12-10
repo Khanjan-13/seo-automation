@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-BMGCmgPS.css",
+    "file": "assets/app-CHuiTpKU.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -9,7 +9,7 @@
     ]
   },
   "resources/css/normal/dashboard.css": {
-    "file": "assets/dashboard-Dyu0JUYZ.css",
+    "file": "assets/dashboard-DFYlcU7L.css",
     "src": "resources/css/normal/dashboard.css",
     "isEntry": true,
     "name": "dashboard",
@@ -27,22 +27,22 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-DGJf6Hlq.js",
+    "file": "assets/app-BPsKg0al.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-BMGCmgPS.css"
+      "assets/app-CHuiTpKU.css"
     ]
   },
   "resources/js/normal/dashboard.js": {
-    "file": "assets/dashboard-Dka_D3rF.js",
+    "file": "assets/dashboard-iQ-KUh1e.js",
     "name": "dashboard",
     "src": "resources/js/normal/dashboard.js",
     "isEntry": true
   },
   "resources/js/normal/document.js": {
-    "file": "assets/document-BA4SDxRk.js",
+    "file": "assets/document-DTog-Mpo.js",
     "name": "document",
     "src": "resources/js/normal/document.js",
     "isEntry": true
