@@ -11,7 +11,7 @@ use App\Models\Message;
 use App\Models\Template;
 use App\Services\AIService;
 
-class DashboardController extends Controller
+class ChatController extends Controller
 {
     protected $aiService;
 
@@ -34,26 +34,19 @@ class DashboardController extends Controller
         $messages = Message::where('user_id', $user->id)
                            ->get();
 
-        return view('normal.dashboard', compact('chats', 'messages'));
+        return view('normal.chat', compact('chats', 'messages'));
     }
 
 
     public function prompt(Request $request)
     {
         $user = Auth::guard('normaluser')->user();
-        session()->save(); // Release session lock to allow parallel requests
 
-        // Support both prompt_payload (legacy/editor) and direct inputs (batch API)
-        if ($request->has('prompt_payload')) {
-            $payload = json_decode($request->input('prompt_payload'), true);
-        } else {
-            $request->validate([
-                'structure' => 'required|array',
-                'model' => 'nullable|string',
-            ]);
-            $payload = $request->all();
-        }
+        $request->validate([
+            'prompt_payload' => 'required',
+        ]);
 
+        $payload = json_decode($request->input('prompt_payload'), true);
         $model = $payload['model'] ?? 'chatgpt';
         $structure = $payload['structure'] ?? [];
         $brandName = $payload['brand_name'] ?? '';
@@ -78,28 +71,24 @@ class DashboardController extends Controller
         $fullPrompt .= "User Requirements:\n";
         if (!empty($structure)) {
             foreach ($structure as $item) {
-                 // Handle both format (nested vs flat)
-                 $tag = $item['tag'] ?? $item['heading'] ?? '';
-                 $content = $item['content'] ?? $item['content_note'] ?? '';
+                // Handle both old format (nested) and new flat format from modal
+                $tag = $item['tag'] ?? $item['heading'] ?? '';
+                $content = $item['content'] ?? $item['content_note'] ?? '';
                 
-                 if (!empty($tag)) {
-                     $fullPrompt .= "- " . $tag;
-                     if (!empty($content)) {
-                         $fullPrompt .= ": " . $content;
-                     }
-                     $fullPrompt .= "\n";
-                 }
-
-                 // Children if any (legacy)
-                 if (isset($item['children'])) {
-                     $fullPrompt .= $this->formatPromptItem($item);
-                 }
+                if (!empty($tag)) {
+                    $fullPrompt .= "- " . $tag;
+                    if (!empty($content)) {
+                        $fullPrompt .= ": " . $content;
+                    }
+                    $fullPrompt .= "\n";
+                }
             }
         }
 
         // Title logic
         $title = $brandName ?: 'Untitled Document';
         if ($title === 'Untitled Document' && !empty($structure)) {
+             // Fallback to first heading if brand name is empty
              $firstItem = $structure[0] ?? null;
              if ($firstItem) {
                  $title = $firstItem['tag'] ?? $firstItem['heading'] ?? 'Untitled Document';
@@ -109,7 +98,7 @@ class DashboardController extends Controller
         // Generate content
         $result = $this->aiService->generateContent($model, $fullPrompt);
         
-        // Handle result
+        // Handle result being either string (error) or array (success)
         if (is_array($result)) {
             $generatedContent = $result['content'];
             $inputTokens = $result['input_tokens'] ?? 0;
@@ -133,7 +122,7 @@ class DashboardController extends Controller
             'cost' => $cost,
         ]);
 
-        // Save messages
+        // Save the user's prompt as a message
         Message::create([
             'user_id' => Auth::id(),
             'chat_id' => $chat->id,
@@ -141,6 +130,7 @@ class DashboardController extends Controller
             'content' => $fullPrompt,
         ]);
 
+        // Save the generated content as a message from AI
         Message::create([
             'user_id' => Auth::id(),
             'chat_id' => $chat->id,
@@ -204,82 +194,7 @@ class DashboardController extends Controller
         ));
     }
 
-    public function outlines()
-    {
-        $user = Auth::guard('normaluser')->user();
-        $outlines = \App\Models\Outline::where('user_id', $user->id)
-                                       ->latest()
-                                       ->paginate(12);
 
-        // Sidebar needs chats
-        $chats = Chat::where('user_id', $user->id)->latest()->get();
-
-        return view('normal.outlines', compact('outlines', 'chats'));
-    }
-    public function generateOutlines(Request $request)
-    {
-        $request->validate([
-            'content_type' => 'required|string',
-            'topic' => 'required|string',
-            'model' => 'nullable|string',
-            'brand_name' => 'nullable|string',
-            'keywords' => 'nullable|string',
-            'location' => 'nullable|string',
-        ]);
-
-        $model = $request->input('model', 'chatgpt');
-        $brandName = $request->input('brand_name');
-        $keywords = $request->input('keywords');
-        $location = $request->input('location');
-
-        $start_prompt = "You are an expert content strategist. Create 3 distinct outline options for a " . $request->content_type . " about: " . $request->topic . ".\n\n";
-        
-        if ($brandName) $start_prompt .= "Brand Name: $brandName\n";
-        if ($keywords) $start_prompt .= "Target Keywords: $keywords\n";
-        if ($location) $start_prompt .= "Target Location: $location\n";
-        $start_prompt .= "\n";
-
-        $start_prompt .= "For each outline, provide:\n";
-        $start_prompt .= "1. A concice and catchy title including $request->topic.\n";
-        $start_prompt .= "2. A brief description of the angle/approach.\n";
-        $start_prompt .= "3. Estimated word count.\n";
-        $start_prompt .= "4. Number of paragraphs.\n";
-        $start_prompt .= "5. A structured list of headings (H2, H3) and a brief note on what each section covers.\n\n";
-        $start_prompt .= "Return the result STRICTLY as a JSON object with a key 'outlines' containing an array of 3 objects. Each object should have keys: 'id' (1, 2, 3), 'title', 'description', 'word_count', 'paragraph_count', 'structure' (array of objects with 'heading' and 'content_note'). Do not include any markdown formatting like ```json.";
-
-        $result = $this->aiService->generateContent($model, $start_prompt);
-
-        if (is_array($result) && isset($result['content'])) {
-            $jsonContent = $result['content'];
-            // Try to parse JSON if it's a string, or use it directly if it's already an array (though service usually returns string content)
-            // AI Service usually returns ['content' => "string"]
-            
-            // Clean markdown if present
-            $jsonString = preg_replace('/^```json\s*|\s*```$/', '', $jsonContent);
-            $parsedData = json_decode($jsonString, true);
-
-            if (json_last_error() === JSON_ERROR_NONE && isset($parsedData['outlines'])) {
-                
-                // Persist the outline logic
-                \App\Models\Outline::create([
-                    'user_id' => Auth::guard('normaluser')->id(),
-                    'content_type' => $request->content_type,
-                    'topic' => $request->topic,
-                    'brand_name' => $brandName,
-                    'keywords' => $keywords,
-                    'location' => $location,
-                    'model' => $model,
-                    'generated_outlines' => $parsedData['outlines'], // Store the valid array
-                ]);
-
-                return response()->json(['outlines' => $parsedData['outlines']]);
-            } else {
-                return response()->json(['error' => 'Failed to parse AI response. Raw: ' . substr($jsonContent, 0, 100) . '...'], 500);
-            }
-        }
-
-        return response()->json(['error' => 'AI generation failed.'], 500);
-    }
 
     private function formatPromptItem($item, $level = 0)
     {

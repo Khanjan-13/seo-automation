@@ -10,6 +10,7 @@ use App\Http\Controllers\Normal\Auth\LoginController as NormalLoginController;
 use App\Http\Controllers\Normal\DashboardController;
 use App\Http\Controllers\ShareController;
 use App\Http\Controllers\Normal\DocumentController;
+use App\Http\Controllers\Normal\ChatController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -55,10 +56,13 @@ Route::post('/user/logout', [NormalLoginController::class, 'logout'])->name('nor
 
 // Normal dashboard
 Route::get('/user/dashboard', [DashboardController::class, 'index'])->name('normal.dashboard')->middleware('auth:normaluser');
+Route::get('/user/chat', [ChatController::class, 'index'])->name('normal.chat')->middleware('auth:normaluser');
 
 Route::get('/user/documents', [DocumentController::class, 'index'])->name('normal.documents')->middleware('auth:normaluser');
-Route::get('/user/settings', [DashboardController::class, 'settings'])->name('normal.settings')->middleware('auth:normaluser');
+Route::get('/user/settings', [ChatController::class, 'settings'])->name('normal.settings')->middleware('auth:normaluser');
 Route::post('/user/prompt', [DashboardController::class, 'prompt'])->name('normal.prompt')->middleware('auth:normaluser');
+Route::get('/user/outlines', [DashboardController::class, 'outlines'])->name('normal.outlines')->middleware('auth:normaluser');
+Route::post('/user/chat/generate-outlines', [DashboardController::class, 'generateOutlines'])->name('normal.chat.generate-outlines')->middleware('auth:normaluser');
 Route::get('/user/document/{chat}', [DocumentController::class, 'show'])->name('normal.document.show')->middleware('auth:normaluser');
 Route::put('/user/document/{chat}', [DocumentController::class, 'update'])->name('normal.document.update')->middleware('auth:normaluser');
 Route::post('/user/document/regenerate', [DocumentController::class, 'regenerateSection'])->name('normal.document.regenerate')->middleware('auth:normaluser');
